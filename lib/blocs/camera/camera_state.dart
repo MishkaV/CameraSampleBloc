@@ -1,12 +1,22 @@
 part of 'camera_bloc.dart';
 
-abstract class CameraState extends Equatable {
-  const CameraState();
+class CameraState extends Equatable {
+  final FlashMode flashMode;
+
+  static const CameraState empty = CameraState();
+
+  const CameraState({this.flashMode = FlashMode.off});
 
   @override
   List<Object> get props => [];
-}
 
+  CameraState copyWith({
+    FlashMode? flashMode,
+  }) =>
+      CameraState(
+        flashMode: flashMode ?? this.flashMode,
+      );
+}
 
 // Init States
 class CameraInitial extends CameraState {}
@@ -21,8 +31,6 @@ class CameraFailure extends CameraState {
   @override
   List<Object> get props => [error];
 }
-
-
 
 // Capture States
 class CameraCaptureInProgress extends CameraState {}

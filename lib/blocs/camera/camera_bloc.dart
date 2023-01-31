@@ -12,7 +12,7 @@ part 'camera_state.dart';
 class CameraBloc extends Bloc<CameraEvent, CameraState> {
   final CameraUtils cameraUtils;
   final ResolutionPreset resolutionPreset;
-  final CameraLensDirection cameraLensDirection;
+  CameraLensDirection cameraLensDirection;
 
   CameraController? _controller;
 
@@ -21,18 +21,38 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     this.resolutionPreset = ResolutionPreset.high,
     this.cameraLensDirection = CameraLensDirection.back,
   }) : super(CameraInitial()) {
-    on<CameraInitialized>(_mapCameraInitializedToState);
-    on<CameraCaptured>(_mapCameraCapturedToState);
-    on<CameraStopped>(_mapCameraStoppedToState);
+    on<CameraInitialized>(_onCameraInitialized);
+    on<CameraCaptured>(_onCameraCaptured);
+    on<CameraStopped>(_onCameraStopped);
+    on<CameraChange>(_onCameraChange);
+    on<CameraFlashChange>(_onCameraFlashChange);
   }
 
   CameraController? getController() => _controller;
 
   bool isInitialized() => _controller?.value?.isInitialized ?? false;
 
-  void _mapCameraInitializedToState(
+  void _onCameraInitialized(
     CameraInitialized event,
     Emitter<CameraState> emit,
+  ) async {
+    await _initCamera(emit, cameraLensDirection, resolutionPreset);
+  }
+
+  void _onCameraChange(
+    CameraChange event,
+    Emitter<CameraState> emit,
+  ) async {
+    cameraLensDirection = cameraLensDirection == CameraLensDirection.back
+        ? CameraLensDirection.front
+        : CameraLensDirection.back;
+    emit.call(CameraInitial()); // TODO FIX
+  }
+
+  Future<void> _initCamera(
+    Emitter<CameraState> emit,
+    CameraLensDirection cameraLensDirection,
+    ResolutionPreset resolutionPreset,
   ) async {
     try {
       _controller = await cameraUtils.getCameraController(
@@ -47,7 +67,17 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     }
   }
 
-  void _mapCameraCapturedToState(
+  void _onCameraFlashChange(
+    CameraFlashChange event,
+    Emitter<CameraState> emit,
+  ) async {
+    var newFlashMode =
+        state.flashMode == FlashMode.off ? FlashMode.torch : FlashMode.off;
+    await _controller?.setFlashMode(newFlashMode);
+    emit(state.copyWith(flashMode: newFlashMode));
+  }
+
+  void _onCameraCaptured(
     CameraCaptured event,
     Emitter<CameraState> emit,
   ) async {
@@ -66,7 +96,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     }
   }
 
-  void _mapCameraStoppedToState(
+  void _onCameraStopped(
     CameraStopped event,
     Emitter<CameraState> emit,
   ) async {

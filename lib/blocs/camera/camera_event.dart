@@ -12,3 +12,7 @@ class CameraInitialized extends CameraEvent{}
 class CameraStopped extends CameraEvent{}
 
 class CameraCaptured extends CameraEvent{}
+
+class CameraChange extends CameraEvent{}
+
+class CameraFlashChange extends CameraEvent{}
