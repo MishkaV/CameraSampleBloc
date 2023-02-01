@@ -20,7 +20,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     required this.cameraUtils,
     this.resolutionPreset = ResolutionPreset.high,
     this.cameraLensDirection = CameraLensDirection.back,
-  }) : super(CameraInitial()) {
+  }) : super(CameraState.empty) {
     on<CameraInitialized>(_onCameraInitialized);
     on<CameraCaptured>(_onCameraCaptured);
     on<CameraStopped>(_onCameraStopped);
@@ -108,5 +108,14 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
   Future<void> close() {
     _controller?.dispose();
     return super.close();
+  }
+
+  ///
+  @override
+  void onTransition(Transition<CameraEvent, CameraState> transition) {
+    super.onTransition(transition);
+    print('Bloc: ${transition.event.runtimeType}:'
+        ' ${transition.currentState.flashMode}'
+        '-> ${transition.nextState.flashMode}');
   }
 }

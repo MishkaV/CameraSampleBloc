@@ -53,7 +53,7 @@ class CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                 return const ErrorScreen();
               }
 
-              if (state is CameraReady) {
+              if (state is CameraReady || state is CameraCaptureSuccess) { // TODO Something with this states
                 return CameraPageContent();
               }
 

@@ -24,7 +24,8 @@ class CameraPageFooter extends StatelessWidget {
           iconPath: "assets/icons/camera/take_photo_button.png",
           iconWidth: 100.0,
           iconHeight: 104.0,
-          backgroundColor: null
+          backgroundColor: null,
+            onPressed: () => BlocProvider.of<CameraBloc>(context).add(CameraCaptured())
         ),
         createZoomButton(),
         createImageButton(), // TODO onPress?

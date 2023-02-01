@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:camera_sample_bloc2/blocs/camera/camera_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 Widget createImageButton({
   double iconWidth = 36.0,
@@ -11,9 +15,15 @@ Widget createImageButton({
     iconWidth: iconWidth,
     iconHeight: iconHeight,
     backgroundColor: backgroundColor,
-    child: IconButton(
-      onPressed: onPressed,
-      icon: Container(),
+    child: BlocBuilder<CameraBloc, CameraState>(
+      builder: (_, state) {
+        return IconButton(
+          onPressed: onPressed,
+          icon: state is CameraCaptureSuccess
+              ? Image.file(File(state.path))
+              : Container(),
+        );
+      },
     ),
   );
 }
